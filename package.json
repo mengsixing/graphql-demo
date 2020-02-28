@@ -1,0 +1,25 @@
+{
+  "name": "graphql-demo",
+  "version": "1.0.0",
+  "description": "1、定义 schema",
+  "main": "index.js",
+  "scripts": {
+    "dev": "node ./src/server/app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lmjben/graphql-demo.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/lmjben/graphql-demo/issues"
+  },
+  "homepage": "https://github.com/lmjben/graphql-demo#readme",
+  "dependencies": {
+    "apollo-server-express": "^2.10.1",
+    "express": "^4.17.1",
+    "graphql": "^14.6.0"
+  }
+}
