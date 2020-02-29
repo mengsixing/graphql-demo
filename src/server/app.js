@@ -1,7 +1,8 @@
 const express = require("express");
-const { ApolloServer } = require("apollo-server-express");
+const { ApolloServer, PubSub } = require("apollo-server-express");
 const fs = require("fs");
 const path = require("path");
+const { createServer } = require("http");
 
 // 获取 mock 数据
 const { students, photos } = require("./db");
@@ -10,6 +11,8 @@ const { students, photos } = require("./db");
 const typeDefs = fs.readFileSync(path.join(__dirname, "./typeDefs.graphql"), {
   encoding: "utf-8"
 });
+
+const pubsub = new PubSub();
 
 // 匹配处理方法
 const resolvers = {
@@ -28,9 +31,17 @@ const resolvers = {
     // 第一个参数为父查询集，因为可能是在嵌套调用
     // 第二个参数为查询集传的参数
     // 第三个参数是在初始化 ApolloServer 时注入的对象
-    postPhoto: (parent, args, yy) => {
-      console.log(parent, args, yy);
+    postPhoto: async (parent, args, { pubsub }) => {
+      await Promise.resolve();
+      pubsub.publish("photo-add", { newPhoto: photos[0] });
       return photos[0];
+    }
+  },
+  Subscription: {
+    newPhoto: {
+      subscribe: (parent, args, { pubsub }) => {
+        return pubsub.asyncIterator("photo-add");
+      }
     }
   },
   Student: {
@@ -50,13 +61,18 @@ const server = new ApolloServer({
   resolvers,
   // 注入自定义对象
   context: {
-    hello: "123"
+    hello: "123",
+    pubsub
   }
 });
 
 const app = express();
+const httpServer = createServer(app);
+
+server.installSubscriptionHandlers(httpServer);
+
 server.applyMiddleware({ app });
 
-app.listen({ port: 4000 }, () =>
+httpServer.listen({ port: 4000 }, () =>
   console.log(`🚀 Server ready at http://localhost:4000${server.graphqlPath}`)
 );

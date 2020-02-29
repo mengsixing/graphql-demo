@@ -42,5 +42,4 @@ input PostPhotoInput {
 # 订阅类型
 type Subscription {
     newPhoto:Photo
-    newStudent:Student
 }
